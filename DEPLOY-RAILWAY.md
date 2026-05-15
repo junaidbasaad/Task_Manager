@@ -137,7 +137,8 @@ Every push/PR to `main` runs `.github/workflows/ci.yml` (lint, migrate, build). 
 | Issue | Fix |
 |-------|-----|
 | API won’t start | Check `JWT_SECRET` length ≥ 32, `DATABASE_URL` linked, logs in Railway |
-| 502 on `/api` from web | Confirm API service name is `api`, `API_UPSTREAM` uses private domain reference |
+| 502 on `/api` from web | See below — almost always `API_UPSTREAM` |
+| 502 on register/login | Web **Variables** → `API_UPSTREAM` must use **Reference** to API service (not typed `${{...}}` as plain text). Service name in reference must match your API service (e.g. `api`). Fallback: `API_UPSTREAM=https://${{YourApi.RAILWAY_PUBLIC_DOMAIN}}`. Clear `VITE_API_URL`. Redeploy **web** then check logs for `nginx proxy upstream:` and no `WARNING: cannot reach` |
 | CORS errors | `CLIENT_URL` / `ALLOWED_ORIGINS` = exact web URL |
 | Uploads disappear | Add Railway volume at `/app/uploads` on API service |
 | Migrations failed | Open API deploy logs; run `npx prisma migrate deploy` in Railway shell |

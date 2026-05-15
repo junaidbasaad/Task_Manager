@@ -3,10 +3,9 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm ci || npm install
 COPY . .
-# Empty = browser calls same-origin /api (nginx proxies to API_UPSTREAM at runtime)
-ARG VITE_API_URL=
-ENV VITE_API_URL=$VITE_API_URL
-RUN npm run build
+# Always empty at build: browser uses same-origin /api; nginx proxies via API_UPSTREAM at runtime.
+# (Railway may inject VITE_API_URL into the build — ignore it.)
+RUN VITE_API_URL= npm run build
 
 FROM nginx:1.27-alpine
 RUN apk add --no-cache curl gettext
