@@ -15,7 +15,14 @@ if [ -z "${API_UPSTREAM:-}" ]; then
   exit 1
 fi
 
-export API_UPSTREAM
+case "${API_UPSTREAM}" in
+  http://*|https://*) ;;
+  *)
+    API_UPSTREAM="https://${API_UPSTREAM}"
+    export API_UPSTREAM
+    echo "NOTE: API_UPSTREAM missing scheme — using ${API_UPSTREAM}"
+    ;;
+esac
 
 echo "nginx listening on port ${PORT}"
 echo "nginx proxy upstream: ${API_UPSTREAM}"
