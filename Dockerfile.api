@@ -5,8 +5,8 @@ WORKDIR /app
 RUN addgroup -g 1001 -S app && adduser -S app -u 1001 -G app
 
 COPY backend/package.json backend/package-lock.json* ./
-RUN npm ci --omit=dev || npm install --omit=dev
 COPY backend/prisma ./prisma
+RUN npm ci --omit=dev --ignore-scripts || npm install --omit=dev --ignore-scripts
 RUN npx prisma generate
 COPY backend/src ./src
 RUN mkdir -p uploads && chown -R app:app /app
