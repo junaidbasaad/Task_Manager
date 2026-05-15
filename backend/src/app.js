@@ -45,6 +45,16 @@ app.use(express.json({ limit: "1mb" }));
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
+app.get("/", (_req, res) => {
+  res.json({
+    success: true,
+    service: "team-task-manager-api",
+    message: "API is running. Use the web app URL for the UI, or call /api/* endpoints.",
+    health: "/api/health/ready",
+    auth: "/api/auth/login",
+  });
+});
+
 app.use("/api/health", healthRoutes);
 
 app.use("/api/auth", authRoutes);
