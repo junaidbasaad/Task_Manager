@@ -44,12 +44,15 @@ case "${API_UPSTREAM}" in
     ;;
 esac
 
+API_UPSTREAM_HOST=$(echo "$API_UPSTREAM" | sed -e 's|^[a-zA-Z]*://||' -e 's|/.*||' -e 's|:.*||')
+export API_UPSTREAM_HOST
+echo "nginx upstream host header: ${API_UPSTREAM_HOST}"
+
 if ! curl -fsS --max-time 10 "${API_UPSTREAM}/api/health/ready" >/dev/null 2>&1; then
   echo "WARNING: cannot reach ${API_UPSTREAM}/api/health/ready from this container."
-  echo "  Fix web API_UPSTREAM or enable private networking. Fallback: use the API public URL:"
-  echo "  API_UPSTREAM=https://\${{YOUR_API_SERVICE.RAILWAY_PUBLIC_DOMAIN}}"
+  echo "  Try private: http://<api-service>.railway.internal:4000"
 fi
 
-envsubst '${PORT} ${API_UPSTREAM}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf
+envsubst '${PORT} ${API_UPSTREAM} ${API_UPSTREAM_HOST}' < /etc/nginx/templates/default.conf.template > /etc/nginx/conf.d/default.conf
 
 exec nginx -g 'daemon off;'
