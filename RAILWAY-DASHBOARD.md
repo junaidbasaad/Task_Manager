@@ -1,42 +1,55 @@
-# Railway dashboard checklist (monorepo)
+# Railway: set Root Directory (required for monorepo)
 
-Railway **cannot** deploy this repo from the root alone. You need **two services** + **Postgres**.
+Railway **does not** read `backend/railway.toml` until **Root Directory** is set in the dashboard. That setting **cannot** be committed to Git — you set it once per service.
 
-## Fix: “Railpack scanning repo root / no start script”
+## API service — set Root Directory to `backend`
 
-That error means **Root Directory** is empty or wrong. Set it per service:
+1. Open [Railway Dashboard](https://railway.app/dashboard).
+2. Open your project → click the **api** service (backend).
+3. Go to **Settings**.
+4. Under **Source** (or **General**), find **Root Directory**.
+5. Enter exactly:
 
-| Service | Root Directory | Config file path |
-|---------|----------------|------------------|
-| **api** (backend) | `backend` | `/backend/railway.toml` |
-| **web** (frontend) | `frontend` | `/frontend/railway.toml` |
+   ```
+   backend
+   ```
 
-### API service (`api`)
+   (no leading slash)
 
-1. Open the **api** service → **Settings**.
-2. **Source** → **Root Directory** → `backend` → **Save**.
-3. **Config file** (or **Config as Code**) → path: `/backend/railway.toml`.
-4. **Build** → Builder should show **Dockerfile** (from config). If it still says Railpack at repo root, redeploy after saving Root Directory.
-5. **Variables** — see `railway.env.example`.
+6. Under **Config file path** (Config as Code), enter:
 
-### Web service (`web`)
+   ```
+   /backend/railway.toml
+   ```
 
-1. New service from same repo (or duplicate settings).
-2. **Root Directory** → `frontend`.
-3. **Config file path** → `/frontend/railway.toml`.
-4. **Variables:**
-   - `API_UPSTREAM` = `http://${{api.RAILWAY_PRIVATE_DOMAIN}}:${{api.PORT}}`
-   - `VITE_API_URL` = *(leave empty)*
+7. Click **Save** / wait for settings to apply.
+8. **Deployments** → **Redeploy** (or push a new commit).
 
-### After web gets a public URL
+You should see the builder use **Dockerfile** from `backend/`, not Railpack scanning the repo root.
 
-On **api**, set:
+## Web service — set Root Directory to `frontend`
 
-- `CLIENT_URL` = your web URL (no trailing slash)
-- `ALLOWED_ORIGINS` = same URL  
+Create a **second** service if you only have one:
 
-Redeploy **api**.
+1. **+ New** → **GitHub Repo** → same `Task_Manager` repo.
+2. **Settings** → **Root Directory** → `frontend`
+3. **Config file path** → `/frontend/railway.toml`
+4. **Service name** → `web`
+5. Variable: `API_UPSTREAM` = `http://${{api.RAILWAY_PRIVATE_DOMAIN}}:${{api.PORT}}`
+6. Redeploy.
 
----
+## Fallback (if Root Directory field is missing)
 
-Full guide: **[DEPLOY-RAILWAY.md](./DEPLOY-RAILWAY.md)**
+Use repo-root Dockerfiles instead of subdirectory roots:
+
+| Service | Config file path | Dockerfile used |
+|---------|------------------|-----------------|
+| API | `/railway.api.toml` | `Dockerfile.api` |
+| Web | `/railway.web.toml` | `Dockerfile.web` |
+
+Still set **two separate services**; do not run both from one service.
+
+## Verify
+
+After deploy, API logs should show Prisma migrate + `API listening on port 4000`.  
+Health: `https://<api-domain>/api/health/ready` → `"ready": true`.

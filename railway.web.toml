@@ -1,0 +1,14 @@
+# Use this ONLY for the web service when Root Directory cannot be set yet.
+# Railway → web service → Settings → Config file path: /railway.web.toml
+#
+# PREFERRED: Root Directory = frontend, Config file path = /frontend/railway.toml
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile.web"
+watchPatterns = ["frontend/**"]
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
