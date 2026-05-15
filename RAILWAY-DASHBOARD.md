@@ -27,14 +27,21 @@ This repo uses **`railway.api.toml`** and **`railway.web.toml`** — you must se
 
 This applies the **Dockerfile** builder (`Dockerfile.api`) and stops Railpack from using the repo-root `package.json` (which has no `start` script).
 
-### Step 2 — Root Directory (pick one)
+### Step 2 — Root Directory + config (must match)
 
-| Option | Root Directory | Config file | Dockerfile |
-|--------|----------------|-------------|------------|
-| **A — recommended** | `backend` | `/backend/railway.toml` *(auto-detected)* | `backend/Dockerfile` |
-| **B — monorepo root** | *(empty)* or `/` | `railway.api.toml` | `Dockerfile.api` |
+| Option | Root Directory | Config file path | Dockerfile |
+|--------|----------------|------------------|------------|
+| **A — recommended** | `backend` | `/backend/railway.toml` or leave blank | `backend/Dockerfile` |
+| **B** | *(empty — repo root)* | `railway.api.toml` | `Dockerfile.api` |
 
-You currently use **Option B** if Root Directory is empty and Config path is `railway.api.toml`.
+**Do not mix A and B.** If you see:
+
+`failed to calculate checksum ... "/backend/src": not found`
+
+you have **Root Directory = `backend`** but **Config = `railway.api.toml`**. Fix:
+
+- Set **Config file path** → `/backend/railway.toml`  
+  **or** clear Root Directory and use `railway.api.toml`
 
 ### Step 3 — Variables
 

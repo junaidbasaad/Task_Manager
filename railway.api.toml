@@ -1,9 +1,10 @@
-# API service — Railway does NOT auto-detect this filename.
-# Set in dashboard: Settings → Config → Config file path → railway.api.toml
-# (or /railway.api.toml)
+# =============================================================================
+# API service — use ONLY when Root Directory is EMPTY (repo root).
+# Config file path in Railway: railway.api.toml
 #
-# Use with repo root as Source (Root Directory empty) OR alongside Root Directory = backend.
-# Builds via Dockerfile.api from monorepo root (see dockerfilePath below).
+# DO NOT use this file if Root Directory = backend
+#   → use /backend/railway.toml instead (builds with backend/Dockerfile)
+# =============================================================================
 
 [build]
 builder = "DOCKERFILE"
