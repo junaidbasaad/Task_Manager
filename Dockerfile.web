@@ -14,7 +14,6 @@ COPY frontend/docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 COPY --from=build /app/dist /usr/share/nginx/html
 ENV PORT=80
-ENV API_UPSTREAM=http://localhost:4000
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD sh -c 'curl -fsS "http://127.0.0.1:${PORT:-80}/" >/dev/null || exit 1'

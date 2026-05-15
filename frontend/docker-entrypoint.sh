@@ -4,9 +4,18 @@ set -eu
 # Docker Compose: http://api:4000
 # Railway (private network): http://${{api.RAILWAY_PRIVATE_DOMAIN}}:${{api.PORT}}
 : "${PORT:=80}"
-: "${API_UPSTREAM:=http://localhost:4000}"
 
-export PORT API_UPSTREAM
+export PORT
+
+if [ -z "${API_UPSTREAM:-}" ]; then
+  echo "ERROR: API_UPSTREAM is not set."
+  echo "  Railway web service → Variables → add API_UPSTREAM via Reference to your API service:"
+  echo "  http://\${{api.RAILWAY_PRIVATE_DOMAIN}}:\${{api.PORT}}"
+  echo "  Or public fallback: https://\${{api.RAILWAY_PUBLIC_DOMAIN}}"
+  exit 1
+fi
+
+export API_UPSTREAM
 
 echo "nginx listening on port ${PORT}"
 echo "nginx proxy upstream: ${API_UPSTREAM}"
@@ -14,8 +23,14 @@ echo "nginx proxy upstream: ${API_UPSTREAM}"
 case "${API_UPSTREAM}" in
   *'${{'*)
     echo "ERROR: API_UPSTREAM still contains Railway template syntax — use Variable References, not a raw string."
-    echo "  Example: http://\${{api.RAILWAY_PRIVATE_DOMAIN}}:\${{api.PORT}} via the References UI"
     exit 1
+    ;;
+  http://localhost:*|http://127.0.0.1:*|http://[::1]:*)
+    if [ -n "${RAILWAY_ENVIRONMENT:-}${RAILWAY_PROJECT_ID:-}" ]; then
+      echo "ERROR: API_UPSTREAM points at localhost (${API_UPSTREAM}). The API runs in a different container."
+      echo "  Set API_UPSTREAM to your API service (private or public URL) and redeploy."
+      exit 1
+    fi
     ;;
 esac
 
