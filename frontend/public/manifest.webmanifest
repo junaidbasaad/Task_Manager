@@ -1,0 +1,17 @@
+{
+  "name": "Team Task Manager",
+  "short_name": "TeamTasks",
+  "description": "Projects, tasks, and team collaboration.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f2eb",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

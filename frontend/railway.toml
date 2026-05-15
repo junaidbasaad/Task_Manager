@@ -1,0 +1,11 @@
+# Railway service: set Root Directory = frontend in the dashboard
+# Name this service "web" (or update API_UPSTREAM to match your API service name)
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+watchPatterns = ["**"]
+
+[deploy]
+healthcheckPath = "/"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"

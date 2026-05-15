@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+.env
+.env.*
+!.env.example
+!**/.env.example
+!railway.env.example
+*.log
+uploads/
+backend/uploads/
+.DS_Store
+coverage/
+*.tsbuildinfo
+frontend/dist/
+backend/dist/
+.vite/
