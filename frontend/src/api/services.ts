@@ -1,7 +1,12 @@
 import { api } from "./client";
 import type { ActivityLog, DashboardStats, Project, Task, User } from "../types";
 
-export async function register(payload: { name: string; email: string; password: string }) {
+export async function register(payload: {
+  name: string;
+  email: string;
+  password: string;
+  role: User["role"];
+}) {
   const { data } = await api.post("/api/auth/register", payload);
   return data.data as { user: User; token: string };
 }

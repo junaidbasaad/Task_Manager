@@ -90,7 +90,7 @@ export function AdminDashboardPage() {
           </p>
         </motion.div>
         <Link
-          to="/"
+          to="/dashboard"
           className="text-sm font-medium text-[var(--color-accent)] hover:underline"
         >
           ← Member dashboard

@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
@@ -9,6 +9,8 @@ import { homePathForUser } from "../utils/authRedirect";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Card } from "../components/ui/Card";
+import { RoleSelect } from "../components/auth/RoleSelect";
+import type { UserRole } from "../types";
 
 const schema = z
   .object({
@@ -16,24 +18,36 @@ const schema = z
     email: z.string().email(),
     password: z.string().min(8, "At least 8 characters"),
     confirm: z.string(),
+    role: z.enum(["ADMIN", "MEMBER"]),
   })
   .refine((d) => d.password === d.confirm, { message: "Passwords must match", path: ["confirm"] });
 
 type Form = z.infer<typeof schema>;
 
+function roleFromQuery(param: string | null): UserRole {
+  return param === "ADMIN" ? "ADMIN" : "MEMBER";
+}
+
 export function RegisterPage() {
   const { register: regUser } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialRole = roleFromQuery(searchParams.get("role"));
+
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<Form>({ resolver: zodResolver(schema) });
+  } = useForm<Form>({
+    resolver: zodResolver(schema),
+    defaultValues: { role: initialRole },
+  });
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      const user = await regUser(values.name, values.email, values.password);
-      toast.success("Account created");
+      const user = await regUser(values.name, values.email, values.password, values.role);
+      toast.success(`Account created as ${values.role === "ADMIN" ? "Admin" : "Member"}`);
       navigate(homePathForUser(user), { replace: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Registration failed");
@@ -48,10 +62,19 @@ export function RegisterPage() {
             TM
           </div>
           <h1 className="text-2xl font-semibold text-[var(--color-fg)]">Create account</h1>
-          <p className="mt-1 text-sm text-[var(--color-muted)]">Invite your team after signing up</p>
+          <p className="mt-1 text-sm text-[var(--color-muted)]">
+            {initialRole === "ADMIN"
+              ? "Registering as an administrator"
+              : "Registering as a team member"}
+          </p>
         </div>
         <Card>
           <form onSubmit={onSubmit} className="space-y-4 text-left">
+            <Controller
+              name="role"
+              control={control}
+              render={({ field }) => <RoleSelect value={field.value} onChange={field.onChange} id="register-role" />}
+            />
             <div>
               <label className="mb-1 block text-xs font-medium text-[var(--color-muted)]">Name</label>
               <Input autoComplete="name" {...register("name")} />
@@ -85,9 +108,15 @@ export function RegisterPage() {
             <Link to="/login" className="font-medium text-[var(--color-accent)] hover:underline">
               Sign in
             </Link>
+            {" · "}
+            <Link to="/" className="font-medium text-[var(--color-accent)] hover:underline">
+              Back
+            </Link>
           </p>
         </Card>
       </motion.div>
     </div>
   );
 }
+
+

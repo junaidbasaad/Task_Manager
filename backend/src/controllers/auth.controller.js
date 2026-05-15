@@ -11,7 +11,7 @@ function sanitizeUser(user) {
 }
 
 export async function register(req, res) {
-  const { name, email, password } = req.validated.body;
+  const { name, email, password, role } = req.validated.body;
   const existing = await prisma.user.findUnique({ where: { email: email.toLowerCase() } });
   if (existing) {
     throw new AppError("Email already registered", 409);
@@ -22,7 +22,7 @@ export async function register(req, res) {
       name,
       email: email.toLowerCase(),
       password: hash,
-      role: "MEMBER",
+      role,
     },
   });
   await logActivity({

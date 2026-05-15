@@ -47,7 +47,7 @@ export function AppLayout() {
           </div>
         </div>
         <nav className="flex flex-1 flex-col gap-1">
-          <NavLink to="/" end className={linkClass}>
+          <NavLink to="/dashboard" end className={linkClass}>
             <LayoutDashboard className="h-4 w-4" /> Dashboard
           </NavLink>
           <NavLink to="/projects" className={linkClass}>
@@ -132,7 +132,7 @@ export function AppLayout() {
           </Suspense>
         </main>
         <nav className="grid grid-cols-5 border-t border-[var(--color-border)] bg-[var(--color-surface)] px-1 py-2 md:hidden">
-          <MobileNav to="/" icon={<LayoutDashboard className="h-5 w-5" />} label="Home" />
+          <MobileNav to="/dashboard" icon={<LayoutDashboard className="h-5 w-5" />} label="Home" />
           <MobileNav to="/flow" icon={<Waves className="h-5 w-5" />} label="Flow" />
           <MobileNav to="/tasks" icon={<CheckSquare className="h-5 w-5" />} label="Tasks" />
           {user?.role === "ADMIN" ? (

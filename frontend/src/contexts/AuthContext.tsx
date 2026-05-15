@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { User } from "../types";
+import type { User, UserRole } from "../types";
 import * as api from "../api/services";
 import { getStoredToken, persistToken, setAuthToken } from "../api/client";
 
@@ -16,7 +16,7 @@ type AuthState = {
   token: string | null;
   ready: boolean;
   login: (email: string, password: string) => Promise<User>;
-  register: (name: string, email: string, password: string) => Promise<User>;
+  register: (name: string, email: string, password: string, role: UserRole) => Promise<User>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   setUser: (u: User | null) => void;
@@ -63,8 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return res.user;
   }, []);
 
-  const register = useCallback(async (name: string, email: string, password: string) => {
-    const res = await api.register({ name, email, password });
+  const register = useCallback(async (name: string, email: string, password: string, role: UserRole) => {
+    const res = await api.register({ name, email, password, role });
     persistToken(res.token);
     setToken(res.token);
     setUser(res.user);
