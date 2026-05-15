@@ -21,8 +21,11 @@ echo "nginx listening on port ${PORT}"
 echo "nginx proxy upstream: ${API_UPSTREAM}"
 
 case "${API_UPSTREAM}" in
-  *'${{'*)
-    echo "ERROR: API_UPSTREAM still contains Railway template syntax — use Variable References, not a raw string."
+  *'${{'*|http://:|https://:)
+    echo "ERROR: API_UPSTREAM is invalid (${API_UPSTREAM})."
+    echo "  Private refs did not resolve. On Railway web → Variables, either:"
+    echo "  1) Re-add API_UPSTREAM using the Reference UI (not typed \${{...}}), or"
+    echo "  2) Set API_UPSTREAM=https://YOUR-API-PUBLIC-DOMAIN.up.railway.app"
     exit 1
     ;;
   http://localhost:*|http://127.0.0.1:*|http://[::1]:*)
