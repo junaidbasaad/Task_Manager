@@ -8,6 +8,17 @@ This guide deploys **three Railway resources** from one GitHub repo:
 
 The web container proxies `/api` and `/uploads` to the API over Railway’s **private network**.
 
+> **Monorepo — read this first**  
+> If the build fails with *“no start script / no main / no index.js”*, Railpack is scanning the **repo root**.  
+> You must set **Root Directory** per service and point to the config file:
+>
+> | Service | Root Directory | Config file path |
+> |---------|----------------|------------------|
+> | **api** | `backend` | `/backend/railway.toml` |
+> | **web** | `frontend` | `/frontend/railway.toml` |
+>
+> Quick checklist: **[RAILWAY-DASHBOARD.md](./RAILWAY-DASHBOARD.md)**
+
 ---
 
 ## Part 1 — Push to GitHub
@@ -41,9 +52,10 @@ git push -u origin main
 1. **+ New** → **GitHub Repo** → same repo (or **Add Service** if already linked).
 2. **Settings** → **General**:
    - **Service name:** `api` (important for web service variables)
-   - **Root Directory:** `backend`
-3. **Settings** → **Build**: Builder **Dockerfile** (uses `backend/railway.toml`).
-4. **Variables** (use **RAW** or **Reference** where noted):
+   - **Root Directory:** `backend` ← **required**
+3. **Settings** → **Config file path:** `/backend/railway.toml`
+4. **Settings** → **Build**: Builder should be **Dockerfile** (from config; not Railpack at repo root).
+5. **Variables** (use **RAW** or **Reference** where noted):
 
 | Variable | Value |
 |----------|--------|
@@ -56,15 +68,15 @@ git push -u origin main
 | `CLIENT_URL` | Set **after** web deploys — your web public URL, e.g. `https://web-production-xxxx.up.railway.app` |
 | `ALLOWED_ORIGINS` | Same as `CLIENT_URL` (comma-separate if you have multiple) |
 
-5. **Settings** → **Networking** → **Generate Domain** (note the public API URL).
-6. **Deploy**. Migrations run automatically (`prisma migrate deploy` in Dockerfile CMD).
-7. **Optional — seed demo data** (once): **Settings** → run in shell or one-off:
+6. **Settings** → **Networking** → **Generate Domain** (note the public API URL).
+7. **Deploy**. Migrations run automatically (`prisma migrate deploy` in Dockerfile CMD).
+8. **Optional — seed demo data** (once): **Settings** → run in shell or one-off:
    ```bash
    npm run db:seed
    ```
    Then change demo passwords in production.
 
-8. **Optional — persistent uploads**: **Settings** → **Volumes** → mount path `/app/uploads`.
+9. **Optional — persistent uploads**: **Settings** → **Volumes** → mount path `/app/uploads`.
 
 Health check path: `/api/health/ready`
 
@@ -75,8 +87,9 @@ Health check path: `/api/health/ready`
 1. **+ New** → same GitHub repo.
 2. **Settings** → **General**:
    - **Service name:** `web`
-   - **Root Directory:** `frontend`
-3. **Variables**:
+   - **Root Directory:** `frontend` ← **required**
+3. **Settings** → **Config file path:** `/frontend/railway.toml`
+4. **Variables**:
 
 | Variable | Value |
 |----------|--------|
@@ -85,11 +98,11 @@ Health check path: `/api/health/ready`
 
 > If your API service is **not** named `api`, replace `api` in the reference with your API service name.
 
-4. **Settings** → **Networking** → **Generate Domain**.
-5. Copy the **web** public URL and update **API** service:
+5. **Settings** → **Networking** → **Generate Domain**.
+6. Copy the **web** public URL and update **API** service:
    - `CLIENT_URL` = web URL (no trailing slash)
    - `ALLOWED_ORIGINS` = web URL
-6. Redeploy **api** after CORS URLs are set.
+7. Redeploy **api** after CORS URLs are set.
 
 Health check path: `/`
 

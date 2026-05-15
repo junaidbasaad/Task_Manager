@@ -1,11 +1,20 @@
-# Railway service: set Root Directory = backend in the dashboard
+# =============================================================================
+# API service (backend) — required Railway dashboard settings:
+#   Settings → Source → Root Directory:  backend
+#   Settings → Config → Config file path: /backend/railway.toml
+# =============================================================================
+
 [build]
+# Use Dockerfile (avoids Railpack scanning repo root)
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-watchPatterns = ["**"]
+# From repo root, only rebuild API when backend changes
+watchPatterns = ["backend/**"]
 
 [deploy]
 healthcheckPath = "/api/health/ready"
 healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
-# Optional: add a Volume in Railway UI mounted at /app/uploads for persistent profile images
+# Used when builder is RAILPACK; Dockerfile CMD handles migrate+start otherwise
+startCommand = "npm start"
+preDeployCommand = ["npx prisma migrate deploy"]
