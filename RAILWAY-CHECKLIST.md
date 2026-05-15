@@ -2,6 +2,23 @@
 
 Use this before clicking **Redeploy**. Empty config path is OK when Root Directory is set.
 
+## Step 0 — Add PostgreSQL (do this first)
+
+Without this, the API **crashes on startup** during `prisma migrate deploy`.
+
+1. Open your Railway **project** (canvas view).
+2. Click **+ New** → **Database** → **PostgreSQL**.
+3. Wait until Postgres shows as **Active**.
+4. Click your **API** service → **Variables** tab.
+5. Click **+ New Variable** → **Add Reference** (or **Reference Variable**).
+6. Select the **PostgreSQL** service → choose **`DATABASE_URL`**.
+7. Railway will show something like `${{Postgres.DATABASE_URL}}` — that is correct.
+8. **Redeploy** the API service.
+
+You should see `DATABASE_URL` listed under Variables (referenced from Postgres).
+
+---
+
 ## API service
 
 | Setting | Value |
@@ -18,7 +35,7 @@ Use this before clicking **Redeploy**. Empty config path is OK when Root Directo
 | `PORT` | `4000` |
 | `TRUST_PROXY` | `1` |
 | `JWT_SECRET` | Random, **32+ characters** (not a demo value) |
-| `DATABASE_URL` | **Reference** → Postgres plugin |
+| `DATABASE_URL` | **Reference** → PostgreSQL service → `DATABASE_URL` |
 
 ### After web is live
 

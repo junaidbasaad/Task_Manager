@@ -9,9 +9,10 @@ RUN npm ci --omit=dev --ignore-scripts || npm install --omit=dev --ignore-script
 RUN npx prisma generate
 
 COPY src ./src
-RUN mkdir -p uploads && chown -R app:app /app
+COPY scripts/start.sh ./scripts/start.sh
+RUN mkdir -p uploads && chmod +x ./scripts/start.sh && chown -R app:app /app
 
 USER app
 ENV NODE_ENV=production
 EXPOSE 4000
-CMD ["sh", "-c", "npx prisma migrate deploy && node src/server.js"]
+CMD ["sh", "./scripts/start.sh"]
