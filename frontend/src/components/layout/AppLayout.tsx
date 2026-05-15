@@ -4,8 +4,9 @@ import { NavLink, Outlet } from "react-router-dom";
 import {
   Activity,
   CheckSquare,
-  Columns3,
+  Waves,
   FolderKanban,
+  Shield,
   LayoutDashboard,
   LogOut,
   Moon,
@@ -40,7 +41,9 @@ export function AppLayout() {
           </div>
           <div>
             <div className="text-sm font-semibold text-[var(--color-fg)]">Team Task Manager</div>
-            <div className="text-xs text-[var(--color-muted)]">Workspace</div>
+            <p className="text-xs text-[var(--color-muted)]">
+              {user?.role === "ADMIN" ? "Admin workspace" : "Member workspace"}
+            </p>
           </div>
         </div>
         <nav className="flex flex-1 flex-col gap-1">
@@ -53,9 +56,14 @@ export function AppLayout() {
           <NavLink to="/tasks" className={linkClass}>
             <CheckSquare className="h-4 w-4" /> Tasks
           </NavLink>
-          <NavLink to="/kanban" className={linkClass}>
-            <Columns3 className="h-4 w-4" /> Kanban
+          <NavLink to="/flow" className={linkClass}>
+            <Waves className="h-4 w-4" /> Flow River
           </NavLink>
+          {user?.role === "ADMIN" ? (
+            <NavLink to="/admin" className={linkClass}>
+              <Shield className="h-4 w-4" /> Admin
+            </NavLink>
+          ) : null}
           <NavLink to="/activity" className={linkClass}>
             <Activity className="h-4 w-4" /> Activity
           </NavLink>
@@ -125,9 +133,13 @@ export function AppLayout() {
         </main>
         <nav className="grid grid-cols-5 border-t border-[var(--color-border)] bg-[var(--color-surface)] px-1 py-2 md:hidden">
           <MobileNav to="/" icon={<LayoutDashboard className="h-5 w-5" />} label="Home" />
-          <MobileNav to="/projects" icon={<FolderKanban className="h-5 w-5" />} label="Projects" />
+          <MobileNav to="/flow" icon={<Waves className="h-5 w-5" />} label="Flow" />
           <MobileNav to="/tasks" icon={<CheckSquare className="h-5 w-5" />} label="Tasks" />
-          <MobileNav to="/kanban" icon={<Columns3 className="h-5 w-5" />} label="Board" />
+          {user?.role === "ADMIN" ? (
+            <MobileNav to="/admin" icon={<Shield className="h-5 w-5" />} label="Admin" />
+          ) : (
+            <MobileNav to="/projects" icon={<FolderKanban className="h-5 w-5" />} label="Projects" />
+          )}
           <MobileNav to="/profile" icon={<UserCircle className="h-5 w-5" />} label="Profile" />
         </nav>
       </div>

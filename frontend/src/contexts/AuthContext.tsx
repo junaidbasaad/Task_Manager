@@ -15,8 +15,8 @@ type AuthState = {
   user: User | null;
   token: string | null;
   ready: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (name: string, email: string, password: string) => Promise<User>;
   logout: () => void;
   refreshUser: () => Promise<void>;
   setUser: (u: User | null) => void;
@@ -60,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     persistToken(res.token);
     setToken(res.token);
     setUser(res.user);
+    return res.user;
   }, []);
 
   const register = useCallback(async (name: string, email: string, password: string) => {
@@ -67,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     persistToken(res.token);
     setToken(res.token);
     setUser(res.user);
+    return res.user;
   }, []);
 
   const logout = useCallback(() => {

@@ -2,6 +2,7 @@ import type { ReactElement } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { Spinner } from "../components/ui/Spinner";
 import { useAuth } from "../contexts/AuthContext";
+import { homePathForUser } from "../utils/authRedirect";
 
 export function ProtectedRoute({ children }: { children: ReactElement }) {
   const { user, ready } = useAuth();
@@ -48,7 +49,7 @@ export function AdminRoute({ children }: { children: ReactElement }) {
 export function GuestRoute({ children }: { children: ReactElement }) {
   const { user, ready } = useAuth();
   const location = useLocation();
-  const from = (location.state as { from?: string } | null)?.from || "/";
+  const from = (location.state as { from?: string } | null)?.from || homePathForUser(user);
 
   if (!ready) {
     return (

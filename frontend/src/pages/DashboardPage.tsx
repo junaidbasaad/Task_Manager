@@ -14,7 +14,8 @@ import {
   YAxis,
 } from "recharts";
 import { motion } from "framer-motion";
-import { Activity, AlertTriangle, CheckCircle2, Folder, ListChecks } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, Folder, ListChecks, Shield } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 import { Card } from "../components/ui/Card";
 import { Spinner } from "../components/ui/Spinner";
 import * as api from "../api/services";
@@ -23,6 +24,7 @@ import type { DashboardStats } from "../types";
 const COLORS = ["#0d9488", "#14b8a6", "#ea580c", "#64748b"];
 
 export function DashboardPage() {
+  const { user } = useAuth();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -88,15 +90,31 @@ export function DashboardPage() {
     <div className="mx-auto max-w-6xl space-y-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-fg)]">Dashboard</h1>
-          <p className="text-sm text-[var(--color-muted)]">Overview of your workspace workload</p>
+          <h1 className="text-2xl font-semibold tracking-tight text-[var(--color-fg)]">
+            Welcome, {user?.name?.split(" ")[0] || "there"}
+          </h1>
+          <p className="text-sm text-[var(--color-muted)]">
+            {user?.role === "ADMIN"
+              ? "Workspace overview — open Admin for user management."
+              : "Your tasks and projects at a glance"}
+          </p>
         </div>
-        <Link
-          to="/activity"
-          className="inline-flex items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-medium text-[var(--color-fg)] shadow-sm hover:bg-[var(--color-surface-2)]"
-        >
-          View activity log
-        </Link>
+        <motion.div className="flex flex-wrap gap-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          {user?.role === "ADMIN" ? (
+            <Link
+              to="/admin"
+              className="inline-flex items-center gap-2 rounded-lg bg-amber-500/15 px-4 py-2 text-sm font-medium text-amber-800 hover:bg-amber-500/25 dark:text-amber-200"
+            >
+              <Shield className="h-4 w-4" /> Admin dashboard
+            </Link>
+          ) : null}
+          <Link
+            to="/activity"
+            className="inline-flex items-center justify-center rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm font-medium text-[var(--color-fg)] shadow-sm hover:bg-[var(--color-surface-2)]"
+          >
+            View activity log
+          </Link>
+        </motion.div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

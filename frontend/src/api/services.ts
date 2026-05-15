@@ -129,3 +129,8 @@ export async function fetchUsers() {
   const { data } = await api.get("/api/users");
   return data.data.users as User[];
 }
+
+export async function updateUserRole(userId: string, role: "ADMIN" | "MEMBER") {
+  const { data } = await api.patch(`/api/users/${userId}/role`, { role });
+  return data.data.user as User;
+}

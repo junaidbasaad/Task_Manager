@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
+import { homePathForUser } from "../utils/authRedirect";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Card } from "../components/ui/Card";
@@ -16,22 +17,44 @@ const schema = z.object({
 
 type Form = z.infer<typeof schema>;
 
+const DEMO_ADMIN = { email: "admin@example.com", password: "Password123!" };
+
 export function LoginPage() {
   const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: string } | null)?.from;
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<Form>({ resolver: zodResolver(schema) });
 
+  const signIn = async (email: string, password: string) => {
+    const signedIn = await login(email, password);
+    toast.success("Welcome back");
+    navigate(from || homePathForUser(signedIn), { replace: true });
+  };
+
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await login(values.email, values.password);
-      toast.success("Welcome back");
+      await signIn(values.email, values.password);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Login failed");
     }
   });
+
+  const onDemoAdmin = async () => {
+    try {
+      await signIn(DEMO_ADMIN.email, DEMO_ADMIN.password);
+    } catch (e) {
+      toast.error(
+        e instanceof Error
+          ? e.message
+          : "Demo login failed — run npm run db:seed on the API service",
+      );
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[var(--color-surface-2)] p-4">
@@ -59,6 +82,15 @@ export function LoginPage() {
             </div>
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Signing in…" : "Sign in"}
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full"
+              disabled={isSubmitting}
+              onClick={() => void onDemoAdmin()}
+            >
+              Sign in as demo admin
             </Button>
           </form>
           <p className="mt-4 text-center text-sm text-[var(--color-muted)]">

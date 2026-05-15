@@ -1,10 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
+import { homePathForUser } from "../utils/authRedirect";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Card } from "../components/ui/Card";
@@ -22,6 +23,7 @@ type Form = z.infer<typeof schema>;
 
 export function RegisterPage() {
   const { register: regUser } = useAuth();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -30,8 +32,9 @@ export function RegisterPage() {
 
   const onSubmit = handleSubmit(async (values) => {
     try {
-      await regUser(values.name, values.email, values.password);
+      const user = await regUser(values.name, values.email, values.password);
       toast.success("Account created");
+      navigate(homePathForUser(user), { replace: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Registration failed");
     }

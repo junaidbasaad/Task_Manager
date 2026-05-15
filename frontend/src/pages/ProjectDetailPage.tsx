@@ -205,9 +205,9 @@ export function ProjectDetailPage() {
           <p className="mt-1 max-w-2xl text-sm text-[var(--color-muted)]">{project.description || "No description"}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link to={`/kanban?projectId=${project.id}`}>
+          <Link to={`/flow?projectId=${project.id}`}>
             <Button variant="secondary" type="button">
-              Open Kanban
+              Open Flow River
             </Button>
           </Link>
           {isAdmin ? (
