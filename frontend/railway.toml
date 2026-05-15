@@ -1,14 +1,9 @@
-# =============================================================================
-# Web service (frontend) — required Railway dashboard settings:
-#   Settings → Source → Root Directory:  frontend
-#   Settings → Config → Config file path: /frontend/railway.toml
-#   Service name: web (so API_UPSTREAM can use ${{api.RAILWAY_PRIVATE_DOMAIN}})
-# =============================================================================
+# Web service — Root Directory: frontend | Config path: (empty) or /frontend/railway.toml
 
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-watchPatterns = ["frontend/**"]
+watchPatterns = ["**"]
 
 [deploy]
 healthcheckPath = "/"

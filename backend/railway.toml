@@ -1,20 +1,12 @@
-# =============================================================================
-# API service (backend) — required Railway dashboard settings:
-#   Settings → Source → Root Directory:  backend
-#   Settings → Config → Config file path: /backend/railway.toml
-# =============================================================================
+# API service — Root Directory: backend | Config path: (empty = auto-detect this file)
 
 [build]
-# Use Dockerfile (avoids Railpack scanning repo root)
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
-# From repo root, only rebuild API when backend changes
-watchPatterns = ["backend/**"]
+watchPatterns = ["**"]
 
 [deploy]
 healthcheckPath = "/api/health/ready"
 healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
-# Used when builder is RAILPACK; Dockerfile CMD handles migrate+start otherwise
-startCommand = "npm start"
-preDeployCommand = ["npx prisma migrate deploy"]
+# Start + migrate: handled by Dockerfile CMD (do not set startCommand here)
