@@ -1,55 +1,64 @@
-# Railway: set Root Directory (required for monorepo)
+# Railway settings for Task_Manager (monorepo)
 
-Railway **does not** read `backend/railway.toml` until **Root Directory** is set in the dashboard. That setting **cannot** be committed to Git — you set it once per service.
+Railway only **auto-detects** `railway.toml` or `railway.json` at the service root.  
+This repo uses **`railway.api.toml`** and **`railway.web.toml`** — you must set the path in the dashboard.
 
-## API service — set Root Directory to `backend`
+---
 
-1. Open [Railway Dashboard](https://railway.app/dashboard).
-2. Open your project → click the **api** service (backend).
-3. Go to **Settings**.
-4. Under **Source** (or **General**), find **Root Directory**.
-5. Enter exactly:
+## API service (backend)
 
-   ```
-   backend
-   ```
+### Step 1 — Config file path (required)
 
-   (no leading slash)
-
-6. Under **Config file path** (Config as Code), enter:
+1. Open your **api** service → **Settings**.
+2. Find **Config file path** / **Config as Code** (not Root Directory).
+3. Set exactly:
 
    ```
-   /backend/railway.toml
+   railway.api.toml
    ```
 
-7. Click **Save** / wait for settings to apply.
-8. **Deployments** → **Redeploy** (or push a new commit).
+   If that fails, try:
 
-You should see the builder use **Dockerfile** from `backend/`, not Railpack scanning the repo root.
+   ```
+   /railway.api.toml
+   ```
 
-## Web service — set Root Directory to `frontend`
+4. Save.
 
-Create a **second** service if you only have one:
+This applies the **Dockerfile** builder (`Dockerfile.api`) and stops Railpack from using the repo-root `package.json` (which has no `start` script).
 
-1. **+ New** → **GitHub Repo** → same `Task_Manager` repo.
-2. **Settings** → **Root Directory** → `frontend`
-3. **Config file path** → `/frontend/railway.toml`
+### Step 2 — Root Directory (pick one)
+
+| Option | Root Directory | Config file | Dockerfile |
+|--------|----------------|-------------|------------|
+| **A — recommended** | `backend` | `/backend/railway.toml` *(auto-detected)* | `backend/Dockerfile` |
+| **B — monorepo root** | *(empty)* or `/` | `railway.api.toml` | `Dockerfile.api` |
+
+You currently use **Option B** if Root Directory is empty and Config path is `railway.api.toml`.
+
+### Step 3 — Variables
+
+See `railway.env.example` — at minimum: `DATABASE_URL`, `JWT_SECRET`, `NODE_ENV=production`, `TRUST_PROXY=1`, and after web is live: `CLIENT_URL` + `ALLOWED_ORIGINS`.
+
+### Step 4 — Redeploy
+
+**Deployments** → **Redeploy**. Build logs should show **Dockerfile** build, not Railpack scanning root `package.json`.
+
+---
+
+## Web service (frontend) — separate service
+
+1. **+ New** → same GitHub repo.
+2. **Config file path** → `railway.web.toml`
+3. **Root Directory** → `frontend` *(recommended)* OR repo root with `railway.web.toml`
 4. **Service name** → `web`
-5. Variable: `API_UPSTREAM` = `http://${{api.RAILWAY_PRIVATE_DOMAIN}}:${{api.PORT}}`
+5. `API_UPSTREAM` = `http://${{api.RAILWAY_PRIVATE_DOMAIN}}:${{api.PORT}}`
 6. Redeploy.
 
-## Fallback (if Root Directory field is missing)
+---
 
-Use repo-root Dockerfiles instead of subdirectory roots:
+## Verify API deploy
 
-| Service | Config file path | Dockerfile used |
-|---------|------------------|-----------------|
-| API | `/railway.api.toml` | `Dockerfile.api` |
-| Web | `/railway.web.toml` | `Dockerfile.web` |
-
-Still set **two separate services**; do not run both from one service.
-
-## Verify
-
-After deploy, API logs should show Prisma migrate + `API listening on port 4000`.  
-Health: `https://<api-domain>/api/health/ready` → `"ready": true`.
+- Build uses **Dockerfile.api** or **backend/Dockerfile**
+- Logs: `prisma migrate deploy` then `API listening on port 4000`
+- `GET /api/health/ready` → `{ "ready": true }`

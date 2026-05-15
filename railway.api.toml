@@ -1,7 +1,9 @@
-# Use this ONLY for the API service when Root Directory cannot be set yet.
-# Railway → api service → Settings → Config file path: /railway.api.toml
+# API service — Railway does NOT auto-detect this filename.
+# Set in dashboard: Settings → Config → Config file path → railway.api.toml
+# (or /railway.api.toml)
 #
-# PREFERRED (cleaner): Root Directory = backend, Config file path = /backend/railway.toml
+# Use with repo root as Source (Root Directory empty) OR alongside Root Directory = backend.
+# Builds via Dockerfile.api from monorepo root (see dockerfilePath below).
 
 [build]
 builder = "DOCKERFILE"
@@ -12,5 +14,4 @@ watchPatterns = ["backend/**"]
 healthcheckPath = "/api/health/ready"
 healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"
-startCommand = "npm start"
 preDeployCommand = ["npx prisma migrate deploy"]

@@ -9,15 +9,15 @@ This guide deploys **three Railway resources** from one GitHub repo:
 The web container proxies `/api` and `/uploads` to the API over Railway’s **private network**.
 
 > **Monorepo — read this first**  
-> If the build fails with *“no start script / no main / no index.js”*, Railpack is scanning the **repo root**.  
-> You must set **Root Directory** per service and point to the config file:
+> Railway only auto-detects `railway.toml` / `railway.json`. This repo uses **`railway.api.toml`** and **`railway.web.toml`** — set **Config file path** in each service’s Settings.  
+> If the build fails with *“no start script”*, Railpack is ignoring your Dockerfile config.
 >
-> | Service | Root Directory | Config file path |
-> |---------|----------------|------------------|
-> | **api** | `backend` | `/backend/railway.toml` |
-> | **web** | `frontend` | `/frontend/railway.toml` |
+> | Service | Config file path (required) | Root Directory (recommended) |
+> |---------|----------------------------|----------------------------|
+> | **api** | `railway.api.toml` | `backend` *(or repo root + `Dockerfile.api`)* |
+> | **web** | `railway.web.toml` | `frontend` |
 >
-> Quick checklist: **[RAILWAY-DASHBOARD.md](./RAILWAY-DASHBOARD.md)**
+> Checklist: **[RAILWAY-DASHBOARD.md](./RAILWAY-DASHBOARD.md)**
 
 ---
 
@@ -53,8 +53,8 @@ git push -u origin main
 2. **Settings** → **General**:
    - **Service name:** `api` (important for web service variables)
    - **Root Directory:** `backend` ← **required**
-3. **Settings** → **Config file path:** `/backend/railway.toml`
-4. **Settings** → **Build**: Builder should be **Dockerfile** (from config; not Railpack at repo root).
+3. **Settings** → **Config file path:** `railway.api.toml` **or** `/backend/railway.toml` if Root Directory is `backend`
+4. **Settings** → **Build**: Builder must be **Dockerfile** (from config; not Railpack at repo root).
 5. **Variables** (use **RAW** or **Reference** where noted):
 
 | Variable | Value |
@@ -88,7 +88,7 @@ Health check path: `/api/health/ready`
 2. **Settings** → **General**:
    - **Service name:** `web`
    - **Root Directory:** `frontend` ← **required**
-3. **Settings** → **Config file path:** `/frontend/railway.toml`
+3. **Settings** → **Config file path:** `railway.web.toml` **or** `/frontend/railway.toml` if Root Directory is `frontend`
 4. **Variables**:
 
 | Variable | Value |
